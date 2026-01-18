@@ -84,7 +84,28 @@ Get your Gemini API key from: https://makersuite.google.com/app/apikey
 
 ## Quick Start
 
-### 1. Ingest Documents
+### 1. Download Large Documents (Optional)
+
+Download documents directly from URLs and automatically ingest them:
+
+```bash
+# Download a single document
+python main.py download --url https://arxiv.org/pdf/1706.03762.pdf --auto-ingest
+
+# Download multiple documents
+python main.py download --url https://arxiv.org/pdf/1706.03762.pdf https://arxiv.org/pdf/2005.14165.pdf --auto-ingest
+
+# Download with custom filename
+python main.py download --url https://example.com/paper.pdf --filename research_paper.pdf
+```
+
+**Popular sources for large documents:**
+- Research Papers: [ArXiv](https://arxiv.org) - `https://arxiv.org/pdf/[paper-id].pdf`
+- Books: [Project Gutenberg](https://www.gutenberg.org) - Public domain books
+- Documentation: Python, Django, TensorFlow docs (PDF format)
+- Wikipedia: Use the Wikipedia PDF API
+
+### 2. Ingest Local Documents
 
 Add your documents to the `data/documents/` folder, then run:
 
@@ -94,13 +115,13 @@ python main.py ingest --path data/documents
 
 Supported file types: PDF, TXT, MD (Markdown)
 
-### 2. Query the Agent
+### 3. Query the Agent
 
 ```bash
 python main.py query "What is machine learning?"
 ```
 
-### 3. Interactive Mode
+### 4. Interactive Mode
 
 ```bash
 python main.py interactive

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from src.config import config
 from src.utils.logger import logger
+from src.utils.downloader import DocumentDownloader
 from src.rag.vector_store import create_vector_store
 from src.graph.workflow import ResearchWorkflow
 from src.loaders.file_loader import load_documents
@@ -91,6 +92,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+  # Download documents
+  python main.py download --url https://example.com/paper.pdf --auto-ingest
+
   # Ingest documents
   python main.py ingest --path data/documents
 
@@ -129,6 +133,25 @@ Examples:
     # Interactive command
     subparsers.add_parser("interactive", help="Interactive mode")
 
+    # Download command
+    download_parser = subparsers.add_parser("download", help="Download documents from URLs")
+    download_parser.add_argument(
+        "--url",
+        nargs="+",
+        required=True,
+        help="URL(s) to download documents from"
+    )
+    download_parser.add_argument(
+        "--filename",
+        nargs="+",
+        help="Optional custom filename(s)"
+    )
+    download_parser.add_argument(
+        "--auto-ingest",
+        action="store_true",
+        help="Automatically ingest downloaded documents"
+    )
+
     # Parse arguments
     args = parser.parse_args()
 
@@ -161,6 +184,27 @@ Examples:
                 print(f"  - {source}")
             print(f"\nDocuments used: {result['documents_used']}")
             print(f"Relevance score: {result['relevance_score']:.1f}/10")
+
+        elif args.command == "download":
+            # Download documents
+            downloader = DocumentDownloader()
+            downloaded_files = downloader.download_multiple(
+                args.url,
+                filenames=args.filename
+            )
+
+            if downloaded_files:
+                print(f"\nSuccessfully downloaded {len(downloaded_files)} file(s):")
+                for file in downloaded_files:
+                    print(f"  - {file}")
+
+                # Auto-ingest if requested
+                if args.auto_ingest:
+                    print("\nAuto-ingesting downloaded documents...")
+                    count = agent.ingest_documents(downloaded_files)
+                    print(f"Successfully ingested {count} document chunks.")
+            else:
+                print("\nNo files were downloaded.")
 
         elif args.command == "interactive":
             # Interactive mode
